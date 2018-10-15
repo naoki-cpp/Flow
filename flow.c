@@ -933,34 +933,49 @@ output text for those commands that require it, spit out all lines that start
 with white space (0x20, 0x09)
 */
 
-    int i;
+int i;
 
-    line[0]=0;
-    fgets(line,LineLen,inFile);
-    InputLine++;
+line[0] = 0;
+fgets(line, LineLen, inFile);
+InputLine++;
 
-    while (!feof(inFile) && (
-	   line[0] == 0x20 ||
-	   line[0] == 0x09 )
-	  ) {
+if (!feof(inFile) && (line[0] == 0x20 ||
+					  line[0] == 0x09))
+{
+	line[strlen(line) - 1] = 0;
+	for (i = 0; i < strlen(line) &&
+				(line[i] == 0x09 || line[i] == 0x20);
+		 i++)
+		;
 
-	    line[strlen(line)-1]=0;
-	    for (i=0; i<strlen(line) &&
-		      (line[i] == 0x09 || line[i] == 0x20); i++);
+	fprintf(outFile, "%s%s%s", leader, line + i, tailer);
+	while (TRUE)
+	{
+		line[0] = 0;
+		fgets(line, LineLen, inFile);
+		InputLine++;
 
-           fprintf(outFile,"%s%s%s",leader,line+i,tailer);
-	    line[0]=0;
-	    fgets(line,LineLen,inFile);
-	    InputLine++;
+		if (line[0] == 0x20 || line[0] == 0x09)
+			fprintf(outFile, "\\\\\n");
+		else
+			fprintf(outFile, "\n");
+		
+		
+		line[strlen(line) - 1] = 0;
+		for (i = 0; i < strlen(line) &&
+					(line[i] == 0x09 || line[i] == 0x20);
+			 i++)
+			;
 
-	   if (line[0] == 0x20 || line[0] == 0x09 )
-	       fprintf(outFile,"\\\\\n");
-	   else
-	       fprintf(outFile,"\n");
+		fprintf(outFile, "%s%s%s", leader, line + i, tailer);
+		if (feof(inFile) || ((line[0] != 0x20 &&
+					  line[0] != 0x09))) {
+						  break;
+		}
+	}
+}
 
-       }
-
-    return 1;
+return 1;
 }
 
 void applyPicWrapper(FILE *inFile, FILE *outFile) {
