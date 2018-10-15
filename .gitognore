@@ -11,6 +11,7 @@
 *.blg
 *.bbl
 *.pdf
+*.flo
 flowpic.tex
 test.tex
 flow
