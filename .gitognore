@@ -1,0 +1,16 @@
+#.gitignore 
+*.div
+*.aux
+*.log
+*.gz
+*.toc
+*.out
+*.dvi
+*.fdb_latexmk
+*.fls
+*.blg
+*.bbl
+*.pdf
+flowpic.tex
+test.tex
+flow
