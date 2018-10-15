@@ -583,7 +583,7 @@ etc. as required
 	doText();
 	fprintf(outFile,"}}}\n");
 
-	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%3.4f){%3.4f}}\n",
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
 		       Coords[CurCoord].x,
 		       Coords[CurCoord].y-CurSize.y*1./5.,
 		       10,1,
