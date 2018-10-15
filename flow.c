@@ -28,6 +28,7 @@ pic environment.
 
 */
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -53,7 +54,7 @@ typedef char param[ParamLen];
 
 #define MaxBoxes 2048  /* could not possibly have more than this */
 
-#define Commands 17
+#define Commands 20
 
 FlowCom fcom[Commands] = {
   { "SetTrack", 1, {0,0}, FALSE },
@@ -68,7 +69,10 @@ FlowCom fcom[Commands] = {
   { "ToTag",    0, {0,0}, FALSE },
   { "Scale",    2, {0,0}, FALSE },
   { "Tilt",     0, {4,2}, TRUE  },
+  { "PredProc", 0, {4,2}, TRUE  },
+  { "Storage",  0, {4,2}, TRUE  },
   { "Prepare",  0, {4,2}, TRUE  },
+  { "ManInput",	0, {4,2}, TRUE  },
   { "Text",     0, {4,2}, TRUE  },
   { "TxtPos",   4, {0,0}, FALSE },
   { "Skip",     2, {0,0}, FALSE },
@@ -87,7 +91,10 @@ typedef enum {SetTrack,
 	      ToTag,
 	      Scale,
 	      Tilt,
+          PredProc,
+          Storage,
           Prepare,
+		  ManInput,
 	      Text,
 	      TxtPos,
 	      Skip,
@@ -416,6 +423,59 @@ etc. as required
     );
 
 	break;
+	
+    case PredProc :
+	init=1;
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\makebox(%3.4f,%3.4f)%s{\\shortstack%s{\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y,
+		       CurSize.x,
+		       CurSize.y,
+		       CurBoxPos,
+		       CurPos);
+	doText();
+	fprintf(outFile,"}}}\n");
+
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y,
+		       1,0,
+		       CurSize.x);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y,
+		       1,0,
+		       CurSize.x);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y,
+		       0,1,
+		       CurSize.y);
+    fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x+CurSize.x*1./20.,
+		       Coords[CurCoord].y-CurSize.y,
+		       0,1,
+		       CurSize.y);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x+CurSize.x,
+		       Coords[CurCoord].y-CurSize.y,
+		       0,1,
+		       CurSize.y);
+
+    fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x+CurSize.x-CurSize.x*1./20.,
+		       Coords[CurCoord].y-CurSize.y,
+		       0,1,
+		       CurSize.y);
+    checkBoundsRng(
+        &pic,
+        Coords[CurCoord].x,
+        Coords[CurCoord].y-CurSize.y,
+        CurSize.x,
+        CurSize.y
+    );
+
+	break;
 
     case Prepare :
 	init=1;
@@ -459,6 +519,90 @@ etc. as required
 		       Coords[CurCoord].y,
 		       1,-2,
 		       CurSize.y*1./4.);
+
+    checkBoundsRng(
+        &pic,
+        Coords[CurCoord].x,
+        Coords[CurCoord].y-CurSize.y,
+        CurSize.x,
+        CurSize.y
+    );
+
+	break;
+
+    case Storage :
+	init=1;
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\oval(%3.4f,%3.4f)[l]}\n",
+		       Coords[CurCoord].x+CurSize.x/4,
+		       Coords[CurCoord].y-CurSize.y/2,
+		       CurSize.x/2,
+		       CurSize.y);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x+CurSize.x/4,
+		       Coords[CurCoord].y,
+		       1,0,
+		       CurSize.x-CurSize.x/4);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\oval(%3.4f,%3.4f)[l]}\n",
+		       Coords[CurCoord].x+CurSize.x,
+		       Coords[CurCoord].y-CurSize.y/2,
+		       CurSize.x/2,
+		       CurSize.y);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x+CurSize.x/4,
+		       Coords[CurCoord].y-CurSize.y,
+		       1,0,
+		       CurSize.x-CurSize.x/4);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\makebox(%3.4f,%3.4f)%s{\\shortstack%s{\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y,
+		       CurSize.x,
+		       CurSize.y,
+		       CurBoxPos,
+		       CurPos );
+	doText();
+	fprintf(outFile,"}}}\n");
+    checkBoundsRng(
+        &pic,
+        Coords[CurCoord].x,
+        Coords[CurCoord].y-CurSize.y,
+        CurSize.x,
+        CurSize.y
+    );
+
+	break;
+
+    case ManInput :
+	init=1;
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\makebox(%3.4f,%3.4f)%s{\\shortstack%s{\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y,
+		       CurSize.x,
+		       CurSize.y,
+		       CurBoxPos,
+		       CurPos);
+	doText();
+	fprintf(outFile,"}}}\n");
+
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%3.4f){%3.4f}}\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y*1./5.,
+		       10,1,
+		       CurSize.x);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y,
+		       1,0,
+		       CurSize.x);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x,
+		       Coords[CurCoord].y-CurSize.y,
+		       0,1,
+		       CurSize.y*4./5.);
+	fprintf(outFile,"\\put(%3.4f,%3.4f){\\line(%d,%d){%3.4f}}\n",
+		       Coords[CurCoord].x+CurSize.x,
+		       Coords[CurCoord].y-CurSize.y,
+		       0,1,
+		       CurSize.y);
 
     checkBoundsRng(
         &pic,
@@ -605,7 +749,7 @@ etc. as required
                            CurSize.y,
                            params[3]
                           );
-                           
+
     checkBoundsRng(
         &pic,
         Coords[CurCoord].x,
